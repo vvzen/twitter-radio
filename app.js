@@ -8,11 +8,13 @@ var voices = {
     "it" : ["Luca", "Alice"]
 };
 
+var twitter_auth = JSON.parse(fs.readFileSync("auth.json"));
+
 var T = new Twit({
-    consumer_key: "GwPXQ3ZKWraOIbphjOSIOU3Xf",
-    consumer_secret: "OUgVdkKsJYKai7jdmecbzlVwX4XaqN9fTz4QDDDoJcieBqBfQ6",
-    access_token: "973638431774560262-2kgZMwY9SeiOa59PRoQz2YrelsvTK2Z",
-    access_token_secret: "yNyuV7yy2VGT60SyEkTM4bC2dUm5AIC7NSUFqLlAcM89O",
+    consumer_key: twitter_auth.consumer_key,
+    consumer_secret: twitter_auth.consumer_secret,
+    access_token: twitter_auth.access_token,
+    access_token_secret: twitter_auth.access_token_secret,
     timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 });
 
