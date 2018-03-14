@@ -15,5 +15,9 @@
 	"dependencies": {
 		"say": "^0.14.0",
 		"twit": "^2.2.9"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/vvzen/twitter-radio.git"
 	}
 }
