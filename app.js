@@ -1,9 +1,10 @@
 const fs = require('fs');
 const Twit = require('twit');
 const say = require('say');
+const readline = require('readline');
 
 var voices = {
-    "en" : ["Alex", "Karen", "Fred", "Moira"],
+    "en" : ["Alex", "Karen", "Moira"],
     "it" : ["Luca", "Alice"]
 };
 
@@ -18,7 +19,13 @@ const T = new Twit({
     timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 });
 
-// for reading user input
+// don't know why, but without this stdin won't work
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+// object for reading user input
 var stdin = process.stdin;
 
 // resume stdin in the parent process (node app won't quit all by itself
@@ -80,6 +87,7 @@ stdin.on("keypress", (letter, key) => {
                 console.log("heard a new tweet!");
             }
         });
+        
         current_keywords = "";
     }
     // on backspace, remove last letter
