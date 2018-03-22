@@ -156,23 +156,6 @@ stdin.on("keypress", (letter, key) => {
                             'OutputFormat': 'pcm',
                             'VoiceId': 'Gwyneth'
                         }
-
-                        // synthesize the actual voice
-                        Polly.synthesizeSpeech(params, (err, data) => {
-                            if (err) {
-                                console.log(err.code)
-                            }
-                            else if (data) {
-                                if (data.AudioStream instanceof Buffer) {
-                                    // Initiate the source
-                                    var bufferStream = new Stream.PassThrough()
-                                    // convert AudioStream into a readable stream
-                                    bufferStream.end(data.AudioStream)
-                                    // Pipe into Player
-                                    bufferStream.pipe(Player)
-                                }
-                            }
-                        });
     
                         try {
                             // say.speak(text_cleaned, current_voice, 0.9, (err) => {
@@ -184,6 +167,7 @@ stdin.on("keypress", (letter, key) => {
                             //         twitter_stream.start();
                             //     }
                             // });
+                            // synthesize the actual voice
                             Polly.synthesizeSpeech(params, (err, data) => {
                                 if (err) {
                                     console.log(err.code)
