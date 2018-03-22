@@ -150,7 +150,14 @@ stdin.on("keypress", (letter, key) => {
                         console.log("----------------------------------");
     
                         let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+                        
+                        let params = {
+                            'Text': text_cleaned,
+                            'OutputFormat': 'pcm',
+                            'VoiceId': 'Gwyneth'
+                        }
 
+                        // synthesize the actual voice
                         Polly.synthesizeSpeech(params, (err, data) => {
                             if (err) {
                                 console.log(err.code)
