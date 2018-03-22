@@ -95,7 +95,7 @@ stdin.on("keypress", (letter, key) => {
             console.log(`started streaming on ${current_keywords}`);
             console.log(`already streaming? ${already_streaming}`);
 
-            if (twitter_stream){
+            if (already_streaming){
                 console.log("stopping previous stream");
                 twitter_stream.stop();
             }
