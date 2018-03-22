@@ -69,7 +69,7 @@ let already_streaming = false;
 let twitter_stream;
 
 // on any data into stdin
-var current_keywords = "";
+let current_keywords = "";
 console.log("What words should we listen to?");
 stdin.on("keypress", (letter, key) => {
 
