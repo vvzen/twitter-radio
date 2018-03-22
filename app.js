@@ -93,7 +93,10 @@ stdin.on("keypress", (letter, key) => {
     
             console.log(`started streaming on ${current_keywords}\n`);
 
-            if (already_streaming && twitter_stream) twitter_stream.stop();
+            if (already_streaming && twitter_stream){
+                console.log("stopping previous stream");
+                twitter_stream.stop();
+            }
         
             // Create a stream object that filters the public stream
             twitter_stream = T.stream("statuses/filter", {
@@ -165,7 +168,6 @@ stdin.on("keypress", (letter, key) => {
                         }
     
                         try {
-
                             // synthesize the actual voice
                             Polly.synthesizeSpeech(params, (err, data) => {
                                 if (err) {
