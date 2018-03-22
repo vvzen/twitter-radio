@@ -92,9 +92,10 @@ stdin.on("keypress", (letter, key) => {
 
             if (err) console.log("Error when writing to port: ", err.message);
     
-            console.log(`started streaming on ${current_keywords}\n`);
+            console.log(`started streaming on ${current_keywords}`);
+            console.log(`already streaming? ${already_streaming}`);
 
-            if (already_streaming && twitter_stream){
+            if (twitter_stream){
                 console.log("stopping previous stream");
                 twitter_stream.stop();
             }
