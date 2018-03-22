@@ -11,9 +11,9 @@ var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err)
 });
 
 var voices = {
-    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_don_diphone"]
+    "us" : ["voice_cmu_us_clb_arctic_clunits"]
 };
-//    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_ked_diphone"]
+//    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_don_diphone", "voice_ked_diphone"]
 
 const twitter_auth = JSON.parse(fs.readFileSync("auth.json"));
 
