@@ -183,7 +183,6 @@ stdin.on("keypress", (letter, key) => {
                                             buffer_stream.end();
                                             player.close();
                                             twitter_stream.start();
-                                            if (callback) callback ();
                                             
                                         })
                                     }
