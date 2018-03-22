@@ -41,18 +41,12 @@ stdin.resume();
 stdin.setRawMode(true);
 stdin.setEncoding("utf8"); // i don't want binary, do you?
 
-// initial write on port
+/* // initial write on port
 port.write("udooready\n", (err) => {
 
     if (err) console.log("Error when writing to port: ", err.message);
 
-    port.write("d:art\n", (err) => {
-        if (err) console.log("Error when writing to port: ", err.message);
-
-        console.log("sending d:udoo is ready");
-    });
-
-});
+}); */
 
 // on any data into stdin
 var current_keywords = "";
@@ -71,69 +65,76 @@ stdin.on("keypress", (letter, key) => {
     }
     // on enter press
     else if (key.sequence === '\r'){
-        console.log(`started streaming on ${current_keywords}\n`);
+
+        // write current words on serial 
+        port.write(`d:${current_keywords}\n`, (err) => {
+
+            if (err) console.log("Error when writing to port: ", err.message);
+    
+            console.log(`started streaming on ${current_keywords}\n`);
         
-        say.stop();
-        
-        // Create a stream object that filters the public stream
-        var stream = T.stream("statuses/filter", {
-            track: current_keywords,
-            language: "en"
-        });
-
-        // Start streaming
-        stream.on("tweet", (tweet) => {
-
-            fs.writeFileSync("test.json", JSON.stringify(tweet));
+            say.stop();
             
-            console.log(tweet);
-            console.log("extended tweet text: ")
-            console.log(tweet.retweeted_status.extended_tweet.full_text);
-            
-            let text_cleaned;
-            // remove the https string from the text using a regex
-            if (tweet.extended_tweet.full_text !== undefined){
-                text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
-            }
-            else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status.extended_tweet !== undefined)){
-                text_cleaned = tweet.retweeted_status.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
-            }
-            else {
-                text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
-            }
+            // Create a stream object that filters the public stream
+            var stream = T.stream("statuses/filter", {
+                track: current_keywords,
+                language: "en"
+            });
 
-            //var text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
-            
-            //FIXME: solve error when tweet contains apostrophes
-            //text_cleaned[0] = text_cleaned[0].replace('"', '').text_cleaned[0].replace("'", "");
+            // Start streaming
+            stream.on("tweet", (tweet) => {
 
-            if (text_cleaned.length > 0){
-
-                text_cleaned = text_cleaned[0];
-                text_cleaned = text_cleaned.replace('"', '');
-                text_cleaned = text_cleaned.replace('…', '');                             
+                fs.writeFileSync("test.json", JSON.stringify(tweet));
                 
-                say.stop();
-                stream.stop();
+                console.log(tweet);
+                console.log("extended tweet text: ")
+                console.log(tweet.retweeted_status.extended_tweet.full_text);
+                
+                let text_cleaned;
+                // remove the https string from the text using a regex
+                if (tweet.extended_tweet.full_text !== undefined){
+                    text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                }
+                else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status.extended_tweet !== undefined)){
+                    text_cleaned = tweet.retweeted_status.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                }
+                else {
+                    text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
+                }
 
-                console.log(text_cleaned);
+                //var text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                
+                //FIXME: solve error when tweet contains apostrophes
+                //text_cleaned[0] = text_cleaned[0].replace('"', '').text_cleaned[0].replace("'", "");
 
-                let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+                if (text_cleaned.length > 0){
 
-                say.speak(text_cleaned, current_voice, 1.0, (err) => {
+                    text_cleaned = text_cleaned[0];
+                    text_cleaned = text_cleaned.replace('"', '');
+                    text_cleaned = text_cleaned.replace('…', '');                             
                     
-                    if (err){
-                        console.log(err);
-                    }
-                    else {
-                        stream.start();
-                    }
-                });
-                console.log("heard a new tweet!");
-            }
+                    say.stop();
+                    stream.stop();
+
+                    console.log(text_cleaned);
+
+                    let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+
+                    say.speak(text_cleaned, current_voice, 1.0, (err) => {
+                        
+                        if (err){
+                            console.log(err);
+                        }
+                        else {
+                            stream.start();
+                        }
+                    });
+                    console.log("heard a new tweet!");
+                }
+            });
+            
+            current_keywords = "";
         });
-        
-        current_keywords = "";
     }
     // on backspace, remove last letter
     else if (key.name === 'backspace'){
