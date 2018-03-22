@@ -91,8 +91,8 @@ stdin.on("keypress", (letter, key) => {
 
             if (err) console.log("Error when writing to port: ", err.message);
     
-            console.log(`started streaming on ${current_keywords}`);
-            console.log(`already streaming? ${already_streaming}`);
+            if (process.env.DEBUG) console.log(`started streaming on ${current_keywords}`);
+            if (process.env.DEBUG) console.log(`already streaming? ${already_streaming}`);
 
             if (already_streaming){
                 console.log("stopping previous stream");
@@ -196,7 +196,7 @@ stdin.on("keypress", (letter, key) => {
                                     }
                                 }
                             });
-                            console.log("heard a new tweet!");
+                            console.log(`heard a new tweet related to ${current_keywords}`);
                         }
                         catch (TypeError){
                             console.log("heard a new EMPTY tweet!");
