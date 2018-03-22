@@ -129,16 +129,21 @@ stdin.on("keypress", (letter, key) => {
 
                     let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
 
-                    say.speak(text_cleaned, current_voice, 1.0, (err) => {
+                    try {
+                        say.speak(text_cleaned, current_voice, 0.9, (err) => {
                         
-                        if (err){
-                            console.log(err);
-                        }
-                        else {
-                            stream.start();
-                        }
-                    });
-                    console.log("heard a new tweet!");
+                            if (err){
+                                console.log(err);
+                            }
+                            else {
+                                stream.start();
+                            }
+                        });
+                        console.log("heard a new tweet!");
+                    }
+                    catch (TypeError){
+                        console.log("heard a new EMPTY tweet!");
+                    }
                 }
             });
             
