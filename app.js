@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Twit = require('twit');
-const say = require('say'); // FIXME: REMOVE
+// const say = require('say'); // FIXME: REMOVE
 const readline = require('readline');
 const SerialPort = require('serialport');
 
@@ -76,7 +76,7 @@ stdin.on("keypress", (letter, key) => {
     // on ctrl-c
     if (key.sequence === '\u0003'){
         console.log("exiting..");
-        say.stop();
+        // say.stop();
         process.exit();
     }
     // on enter press
@@ -89,7 +89,7 @@ stdin.on("keypress", (letter, key) => {
     
             console.log(`started streaming on ${current_keywords}\n`);
         
-            say.stop();
+            // say.stop();
             
             // Create a stream object that filters the public stream
             var twitter_stream = T.stream("statuses/filter", {
@@ -142,7 +142,7 @@ stdin.on("keypress", (letter, key) => {
                         text_cleaned = text_cleaned.replace('“', '');
                         text_cleaned = text_cleaned.replace('”', '');                   
                         
-                        say.stop();
+                        // say.stop();
                         twitter_stream.stop();
                         
                         console.log("----------------------------------");
