@@ -86,9 +86,7 @@ stdin.on("keypress", (letter, key) => {
 
                 fs.writeFileSync("test.json", JSON.stringify(tweet));
                 
-                console.log(tweet);
-                console.log("extended tweet text: ")
-                console.log(tweet.retweeted_status.extended_tweet.full_text);
+                if (process.env.DEBUG) console.log(tweet);
                 
                 let text_cleaned;
                 // remove the https string from the text using a regex
