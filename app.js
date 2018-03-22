@@ -95,7 +95,7 @@ stdin.on("keypress", (letter, key) => {
                 if (tweet.extended_tweet !== undefined){
                     text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
                 }
-                else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status.extended_tweet !== undefined)){
+                else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status !== undefined)){
                     text_cleaned = tweet.retweeted_status.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
                 }
                 else {
