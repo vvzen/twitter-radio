@@ -73,6 +73,9 @@ stdin.on("keypress", (letter, key) => {
     // console.log(key);
     // console.log(`${letter}`);
     //console.log(`${current_keywords}`);
+
+    let already_streaming = false;
+    let twitter_stream;
     
     // on ctrl-c
     if (key.sequence === '\u0003'){
@@ -89,21 +92,21 @@ stdin.on("keypress", (letter, key) => {
             if (err) console.log("Error when writing to port: ", err.message);
     
             console.log(`started streaming on ${current_keywords}\n`);
+
+            if (already_streaming && twitter_stream) twitter_stream.stop();
         
-            // say.stop();
-            
             // Create a stream object that filters the public stream
-            var twitter_stream = T.stream("statuses/filter", {
+            twitter_stream = T.stream("statuses/filter", {
                 track: current_keywords,
                 language: "en"
             });
 
-            twitter_stream.stop();
-
             // Start streaming
             twitter_stream.on("tweet", (tweet) => {
 
-                fs.writeFileSync("test.json", JSON.stringify(tweet));
+                already_streaming = true;
+
+                //fs.writeFileSync("test.json", JSON.stringify(tweet));
                 
                 if (process.env.DEBUG) console.log(tweet);
                 
