@@ -11,7 +11,7 @@ var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err)
 });
 
 var voices = {
-    "us" : ["voice_cmu_us_clb_arctic_clunits"]
+    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_don_diphone"]
 };
 //    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_ked_diphone"]
 
@@ -120,12 +120,16 @@ stdin.on("keypress", (letter, key) => {
 
                     text_cleaned = text_cleaned[0];
                     text_cleaned = text_cleaned.replace('"', '');
-                    text_cleaned = text_cleaned.replace('…', '');                             
+                    text_cleaned = text_cleaned.replace('…', '');
+                    text_cleaned = text_cleaned.replace('“', '');
+                    text_cleaned = text_cleaned.replace('”', '');                   
                     
                     say.stop();
                     stream.stop();
-
+                    
+                    console.log("----------------------------------");
                     console.log(text_cleaned);
+                    console.log("----------------------------------");
 
                     let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
 
