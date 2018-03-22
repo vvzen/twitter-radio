@@ -19,9 +19,13 @@ const Player = new Speaker({
 let params = {
     'Text': 'Hello this is a test of a more complex sentence.',
     'OutputFormat': 'pcm',
-    'VoiceId': 'Kimberly'
+    'VoiceId': 'Gwyneth'
 }
 
+let available_voices = ["Geraint", "Gwyneth", "Mads", "Naja", "Hans", "Marlene", "Nicole", "Russell", "Amy", "Brian", "Emma", "Raveena", "Ivy", "Joanna", "Joey", "Justin", "Kendra", "Kimberly", "Salli"];
+
+//params.VoiceId = available_voices[Math.floor(Math.random() * available_voices.length)];
+ 
 Polly.synthesizeSpeech(params, (err, data) => {
     if (err) {
         console.log(err.code)

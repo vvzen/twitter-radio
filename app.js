@@ -1,19 +1,35 @@
 const fs = require('fs');
 const Twit = require('twit');
-const say = require('say');
+const say = require('say'); // FIXME: REMOVE
 const readline = require('readline');
 const SerialPort = require('serialport');
 
+// Load the SDK
+const AWS = require('aws-sdk');
+const Stream = require('stream');
+const Speaker = require('speaker');
+
+// Serial Port  init
 var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err) => {
-
     if (err) console.log("Error when opening port: ", err.message);
-
 });
 
 var voices = {
     "us" : ["voice_cmu_us_clb_arctic_clunits"]
 };
-//    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_don_diphone", "voice_ked_diphone"]
+
+// Create a AWS Polly client used for TTS
+const Polly = new AWS.Polly({
+    signatureVersion: 'v4',
+    region: 'us-east-1'
+})
+
+// Create a Speaker instance to play out audio
+const Player = new Speaker({
+    channels: 1,
+    bitDepth: 16,
+    sampleRate: 16000
+})
 
 const twitter_auth = JSON.parse(fs.readFileSync("auth.json"));
 
@@ -76,13 +92,13 @@ stdin.on("keypress", (letter, key) => {
             say.stop();
             
             // Create a stream object that filters the public stream
-            var stream = T.stream("statuses/filter", {
+            var twitter_stream = T.stream("statuses/filter", {
                 track: current_keywords,
                 language: "en"
             });
 
             // Start streaming
-            stream.on("tweet", (tweet) => {
+            twitter_stream.on("tweet", (tweet) => {
 
                 fs.writeFileSync("test.json", JSON.stringify(tweet));
                 
@@ -127,22 +143,53 @@ stdin.on("keypress", (letter, key) => {
                         text_cleaned = text_cleaned.replace('”', '');                   
                         
                         say.stop();
-                        stream.stop();
+                        twitter_stream.stop();
                         
                         console.log("----------------------------------");
                         console.log(text_cleaned);
                         console.log("----------------------------------");
     
                         let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+
+                        Polly.synthesizeSpeech(params, (err, data) => {
+                            if (err) {
+                                console.log(err.code)
+                            }
+                            else if (data) {
+                                if (data.AudioStream instanceof Buffer) {
+                                    // Initiate the source
+                                    var bufferStream = new Stream.PassThrough()
+                                    // convert AudioStream into a readable stream
+                                    bufferStream.end(data.AudioStream)
+                                    // Pipe into Player
+                                    bufferStream.pipe(Player)
+                                }
+                            }
+                        });
     
                         try {
-                            say.speak(text_cleaned, current_voice, 0.9, (err) => {
+                            // say.speak(text_cleaned, current_voice, 0.9, (err) => {
                             
-                                if (err){
-                                    console.log(err);
+                            //     if (err){
+                            //         console.log(err);
+                            //     }
+                            //     else {
+                            //         twitter_stream.start();
+                            //     }
+                            // });
+                            Polly.synthesizeSpeech(params, (err, data) => {
+                                if (err) {
+                                    console.log(err.code)
                                 }
-                                else {
-                                    stream.start();
+                                else if (data) {
+                                    if (data.AudioStream instanceof Buffer) {
+                                        // Initiate the source
+                                        var bufferStream = new Stream.PassThrough()
+                                        // convert AudioStream into a readable stream
+                                        bufferStream.end(data.AudioStream)
+                                        // Pipe into Player
+                                        bufferStream.pipe(Player)
+                                    }
                                 }
                             });
                             console.log("heard a new tweet!");
