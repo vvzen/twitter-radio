@@ -9,20 +9,22 @@ const AWS = require('aws-sdk');
 const Stream = require('stream');
 const Speaker = require('speaker');
 
+// SERIAL
 // Serial Port  init
 var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err) => {
     if (err) console.log("Error when opening port: ", err.message);
 });
 
-var voices = {
-    "en" : ["Geraint", "Salli", "Matthew", "Brian", "Amy"]
-};
-
+// TEXT TO SPEECH
 // Create a AWS Polly client used for TTS
 const Polly = new AWS.Polly({
     signatureVersion: 'v4',
     region: 'us-east-1'
 })
+var voices = {
+    "en" : ["Geraint", "Salli", "Matthew", "Brian", "Amy"]
+};
+const SPEAKER_CONFIG = { channels: 1, bitDepth: 16, sampleRate: 16000 };
 
 // console log the available voices
 // Polly.describeVoices((err, data) => {
@@ -147,7 +149,8 @@ stdin.on("keypress", (letter, key) => {
                         console.log("----------------------------------");
                         console.log(text_cleaned);
                         console.log("----------------------------------");
-    
+                        
+                        // pick a random voice from the available ones
                         let current_voice = voices.en[Math.floor(Math.random()*voices.en.length)];
                         
                         let params = {
@@ -158,13 +161,6 @@ stdin.on("keypress", (letter, key) => {
     
                         try {
 
-                            // Create a Speaker instance to play out audio
-                            const Player = new Speaker({
-                                channels: 1,
-                                bitDepth: 16,
-                                sampleRate: 16000
-                            })
-
                             // synthesize the actual voice
                             Polly.synthesizeSpeech(params, (err, data) => {
                                 if (err) {
@@ -172,13 +168,24 @@ stdin.on("keypress", (letter, key) => {
                                 }
                                 else if (data) {
                                     if (data.AudioStream instanceof Buffer) {
+                                        // Create a Speaker instance to play out audio
+                                        const player = new Speaker(SPEAKER_CONFIG);
                                         // Initiate the source
-                                        var bufferStream = new Stream.PassThrough()
+                                        var buffer_stream = new Stream.PassThrough()
                                         // convert AudioStream into a readable stream
-                                        bufferStream.end(data.AudioStream)
+                                        buffer_stream.end(data.AudioStream)
                                         // Pipe into Player
-                                        bufferStream.pipe(Player)
-                                        twitter_stream.start()
+                                        buffer_stream.pipe(player)
+                                        // Callback when is done
+                                        player.on("finish", () => {
+                                            
+                                            buffer_stream.unpipe(player);
+                                            buffer_stream.end();
+                                            player.close();
+                                            twitter_stream.start();
+                                            if (callback) callback ();
+                                            
+                                        })
                                     }
                                 }
                             });
