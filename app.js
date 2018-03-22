@@ -115,8 +115,8 @@ stdin.on("keypress", (letter, key) => {
                 
                 // when there is one unmatched quote symbol, festival crashes
                 // so only go on if we found 0 or 2
-                var double_quotes_count = (text_cleaned.match(/"/g) || []).length;
-                var single_quotes_count = (text_cleaned.match(/'/g) || []).length;
+                var double_quotes_count = (text_cleaned[0].match(/"/g) || []).length;
+                var single_quotes_count = (text_cleaned[0].match(/'/g) || []).length;
                 if ((double_quotes_count == 0 || double_quotes_count > 1) && (single_quotes_count == 0 || single_quotes_count > 1)){
                     if (text_cleaned.length > 0){
 
