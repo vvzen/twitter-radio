@@ -92,7 +92,7 @@ stdin.on("keypress", (letter, key) => {
                 
                 let text_cleaned;
                 // remove the https string from the text using a regex
-                if (tweet.extended_tweet.full_text !== undefined){
+                if (tweet.extended_tweet !== undefined){
                     text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
                 }
                 else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status.extended_tweet !== undefined)){
