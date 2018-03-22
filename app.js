@@ -66,6 +66,7 @@ port.write("udooready\n", (err) => {
 }); */
 
 let already_streaming = false;
+let twitter_stream;
 
 // on any data into stdin
 var current_keywords = "";
@@ -75,8 +76,6 @@ stdin.on("keypress", (letter, key) => {
     // console.log(key);
     // console.log(`${letter}`);
     //console.log(`${current_keywords}`);
-
-    let twitter_stream;
     
     // on ctrl-c
     if (key.sequence === '\u0003'){
