@@ -2,11 +2,18 @@ const fs = require('fs');
 const Twit = require('twit');
 const say = require('say');
 const readline = require('readline');
+const SerialPort = require('serialport');
+
+var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err) => {
+
+    if (err) console.log("Error when opening port: ", err.message);
+
+});
 
 var voices = {
-    "en" : ["Alex", "Karen", "Moira"],
-    "it" : ["Luca", "Alice"]
+    "us" : ["voice_cmu_us_clb_arctic_clunits"]
 };
+//    "us" : ["voice_cmu_us_clb_arctic_clunits", "voice_ked_diphone"]
 
 const twitter_auth = JSON.parse(fs.readFileSync("auth.json"));
 
@@ -33,6 +40,19 @@ var stdin = process.stdin;
 stdin.resume();
 stdin.setRawMode(true);
 stdin.setEncoding("utf8"); // i don't want binary, do you?
+
+// initial write on port
+port.write("udooready\n", (err) => {
+
+    if (err) console.log("Error when writing to port: ", err.message);
+
+    port.write("d:art\n", (err) => {
+        if (err) console.log("Error when writing to port: ", err.message);
+
+        console.log("sending d:udoo is ready");
+    });
+
+});
 
 // on any data into stdin
 var current_keywords = "";
@@ -63,19 +83,44 @@ stdin.on("keypress", (letter, key) => {
 
         // Start streaming
         stream.on("tweet", (tweet) => {
-            // console.log(tweet.text);
 
+            fs.writeFileSync("test.json", JSON.stringify(tweet));
+            
+            console.log(tweet);
+            console.log("extended tweet text: ")
+            console.log(tweet.retweeted_status.extended_tweet.full_text);
+            
+            let text_cleaned;
             // remove the https string from the text using a regex
-            var text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
+            if (tweet.extended_tweet.full_text !== undefined){
+                text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+            }
+            else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status.extended_tweet !== undefined)){
+                text_cleaned = tweet.retweeted_status.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+            }
+            else {
+                text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
+            }
+
+            //var text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+            
+            //FIXME: solve error when tweet contains apostrophes
+            //text_cleaned[0] = text_cleaned[0].replace('"', '').text_cleaned[0].replace("'", "");
 
             if (text_cleaned.length > 0){
+
+                text_cleaned = text_cleaned[0];
+                text_cleaned = text_cleaned.replace('"', '');
+                text_cleaned = text_cleaned.replace('…', '');                             
                 
                 say.stop();
                 stream.stop();
 
-                let current_voice = voices.en[Math.floor(Math.random()*voices.en.length)];
+                console.log(text_cleaned);
 
-                say.speak(text_cleaned[0], current_voice, 1.1, (err) => {
+                let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+
+                say.speak(text_cleaned, current_voice, 1.0, (err) => {
                     
                     if (err){
                         console.log(err);
