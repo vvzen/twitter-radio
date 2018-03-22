@@ -111,43 +111,46 @@ stdin.on("keypress", (letter, key) => {
                     text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
                 }
 
-                //var text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
-                
                 //FIXME: solve error when tweet contains apostrophes
-                //text_cleaned[0] = text_cleaned[0].replace('"', '').text_cleaned[0].replace("'", "");
+                
+                // when there is one unmatched quote symbol, festival crashes
+                // so only go on if we found 0 or 2
+                var double_quotes_count = (text_cleaned.match(/"/g) || []).length;
+                var single_quotes_count = (text_cleaned.match(/'/g) || []).length;
+                if ((double_quotes_count == 0 || double_quotes_count > 1) && (single_quotes_count == 0 || single_quotes_count > 1)){
+                    if (text_cleaned.length > 0){
 
-                if (text_cleaned.length > 0){
-
-                    text_cleaned = text_cleaned[0];
-                    text_cleaned = text_cleaned.replace('"', '');
-                    text_cleaned = text_cleaned.replace('…', '');
-                    text_cleaned = text_cleaned.replace('“', '');
-                    text_cleaned = text_cleaned.replace('”', '');                   
-                    
-                    say.stop();
-                    stream.stop();
-                    
-                    console.log("----------------------------------");
-                    console.log(text_cleaned);
-                    console.log("----------------------------------");
-
-                    let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
-
-                    try {
-                        say.speak(text_cleaned, current_voice, 0.9, (err) => {
+                        text_cleaned = text_cleaned[0];
+                        text_cleaned = text_cleaned.replace('"', '');
+                        text_cleaned = text_cleaned.replace('…', '');
+                        text_cleaned = text_cleaned.replace('“', '');
+                        text_cleaned = text_cleaned.replace('”', '');                   
                         
-                            if (err){
-                                console.log(err);
-                            }
-                            else {
-                                stream.start();
-                            }
-                        });
-                        console.log("heard a new tweet!");
-                    }
-                    catch (TypeError){
-                        console.log("heard a new EMPTY tweet!");
-                    }
+                        say.stop();
+                        stream.stop();
+                        
+                        console.log("----------------------------------");
+                        console.log(text_cleaned);
+                        console.log("----------------------------------");
+    
+                        let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+    
+                        try {
+                            say.speak(text_cleaned, current_voice, 0.9, (err) => {
+                            
+                                if (err){
+                                    console.log(err);
+                                }
+                                else {
+                                    stream.start();
+                                }
+                            });
+                            console.log("heard a new tweet!");
+                        }
+                        catch (TypeError){
+                            console.log("heard a new EMPTY tweet!");
+                        }
+                    }   
                 }
             });
             
