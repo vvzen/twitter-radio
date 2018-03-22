@@ -65,6 +65,8 @@ port.write("udooready\n", (err) => {
 
 }); */
 
+let already_streaming = false;
+
 // on any data into stdin
 var current_keywords = "";
 console.log("What words should we listen to?");
@@ -74,7 +76,6 @@ stdin.on("keypress", (letter, key) => {
     // console.log(`${letter}`);
     //console.log(`${current_keywords}`);
 
-    let already_streaming = false;
     let twitter_stream;
     
     // on ctrl-c
