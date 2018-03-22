@@ -83,8 +83,6 @@ stdin.on("keypress", (letter, key) => {
     // on enter press
     else if (key.sequence === '\r'){
 
-        if (twitter_stream) twitter_stream.stop();
-
         // write current words on serial 
         port.write(`d:${current_keywords}\n`, (err) => {
 
@@ -99,6 +97,8 @@ stdin.on("keypress", (letter, key) => {
                 track: current_keywords,
                 language: "en"
             });
+
+            twitter_stream.stop();
 
             // Start streaming
             twitter_stream.on("tweet", (tweet) => {
