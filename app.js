@@ -90,11 +90,22 @@ stdin.on("keypress", (letter, key) => {
                 
                 let text_cleaned;
                 // remove the https string from the text using a regex
+                // and try to get the longer version of the tweet if possible
                 if (tweet.extended_tweet !== undefined){
-                    text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                    try {
+                        text_cleaned = tweet.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                    }
+                    catch (TypeError){
+                        text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
+                    }
                 }
-                else if ((tweet.text.indexOf("RT") > -1) && (tweet.retweeted_status !== undefined)){
-                    text_cleaned = tweet.retweeted_status.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                else if (tweet.retweeted_status !== undefined){
+                    try {
+                        text_cleaned = tweet.retweeted_status.extended_tweet.full_text.split(/https:\/\/\w+.co\/\w+/);
+                    }
+                    catch (TypeError){
+                        text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
+                    }
                 }
                 else {
                     text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
