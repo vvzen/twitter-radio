@@ -41,3 +41,19 @@ Polly.synthesizeSpeech(params, (err, data) => {
         }
     }
 });
+
+Polly.synthesizeSpeech(params, (err, data) => {
+    if (err) {
+        console.log(err.code)
+    }
+    else if (data) {
+        if (data.AudioStream instanceof Buffer) {
+            // Initiate the source
+            var bufferStream = new Stream.PassThrough()
+            // convert AudioStream into a readable stream
+            bufferStream.end(data.AudioStream)
+            // Pipe into Player
+            bufferStream.pipe(Player)
+        }
+    }
+});

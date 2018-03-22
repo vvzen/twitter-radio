@@ -15,7 +15,7 @@ var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err)
 });
 
 var voices = {
-    "us" : ["voice_cmu_us_clb_arctic_clunits"]
+    "en" : ["Geraint", "Salli", "Matthew", "Brian", "Amy"]
 };
 
 // Create a AWS Polly client used for TTS
@@ -24,12 +24,11 @@ const Polly = new AWS.Polly({
     region: 'us-east-1'
 })
 
-// Create a Speaker instance to play out audio
-const Player = new Speaker({
-    channels: 1,
-    bitDepth: 16,
-    sampleRate: 16000
-})
+// console log the available voices
+// Polly.describeVoices((err, data) => {
+//     if (err) console.log(err, err.stack);
+//     else console.log(data);
+// })
 
 const twitter_auth = JSON.parse(fs.readFileSync("auth.json"));
 
@@ -149,24 +148,23 @@ stdin.on("keypress", (letter, key) => {
                         console.log(text_cleaned);
                         console.log("----------------------------------");
     
-                        let current_voice = voices.us[Math.floor(Math.random()*voices.us.length)];
+                        let current_voice = voices.en[Math.floor(Math.random()*voices.en.length)];
                         
                         let params = {
                             'Text': text_cleaned,
                             'OutputFormat': 'pcm',
-                            'VoiceId': 'Gwyneth'
+                            'VoiceId': current_voice
                         }
     
                         try {
-                            // say.speak(text_cleaned, current_voice, 0.9, (err) => {
-                            
-                            //     if (err){
-                            //         console.log(err);
-                            //     }
-                            //     else {
-                            //         twitter_stream.start();
-                            //     }
-                            // });
+
+                            // Create a Speaker instance to play out audio
+                            const Player = new Speaker({
+                                channels: 1,
+                                bitDepth: 16,
+                                sampleRate: 16000
+                            })
+
                             // synthesize the actual voice
                             Polly.synthesizeSpeech(params, (err, data) => {
                                 if (err) {
@@ -180,6 +178,7 @@ stdin.on("keypress", (letter, key) => {
                                         bufferStream.end(data.AudioStream)
                                         // Pipe into Player
                                         bufferStream.pipe(Player)
+                                        twitter_stream.start()
                                     }
                                 }
                             });
