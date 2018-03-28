@@ -8,6 +8,7 @@ const fs = require('fs');
 const Twit = require('twit');
 const readline = require('readline');
 const SerialPort = require('serialport');
+// in order for AWK to work you will need to have your credentials in this file: ~/.aws/credentials
 const AWS = require('aws-sdk');
 const Stream = require('stream');
 const Speaker = require('speaker');
