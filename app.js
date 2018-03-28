@@ -1,16 +1,19 @@
+// Name: Valerio Viperino
+// Course: Physical Computing
+// Assignment: Term 2 Final Project
+
+// Project Title: Twitter Head
+
 const fs = require('fs');
 const Twit = require('twit');
-// const say = require('say'); // FIXME: REMOVE
 const readline = require('readline');
 const SerialPort = require('serialport');
-
-// Load the SDK
 const AWS = require('aws-sdk');
 const Stream = require('stream');
 const Speaker = require('speaker');
 
 // SERIAL
-// Serial Port  init
+// Init Serial Port 
 var port = new SerialPort("/dev/ttyUSB0", {autoOpen:true, baudRate: 9600}, (err) => {
     if (err) console.log("Error when opening port: ", err.message);
 });
@@ -21,6 +24,7 @@ const Polly = new AWS.Polly({
     signatureVersion: 'v4',
     region: 'us-east-1'
 })
+// I picked some of the available voices for Polly
 var voices = {
     "en" : ["Geraint", "Salli", "Matthew", "Brian", "Amy"]
 };
@@ -32,6 +36,7 @@ const SPEAKER_CONFIG = { channels: 1, bitDepth: 16, sampleRate: 16000 };
 //     else console.log(data);
 // })
 
+// Load auth credentials for twitter bot
 const twitter_auth = JSON.parse(fs.readFileSync("auth.json"));
 
 // Twit object for accessing twitter api
@@ -58,13 +63,6 @@ stdin.resume();
 stdin.setRawMode(true);
 stdin.setEncoding("utf8"); // i don't want binary, do you?
 
-/* // initial write on port
-port.write("udooready\n", (err) => {
-
-    if (err) console.log("Error when writing to port: ", err.message);
-
-}); */
-
 let already_streaming = false;
 let twitter_stream;
 
@@ -83,7 +81,7 @@ stdin.on("keypress", (letter, key) => {
         // say.stop();
         process.exit();
     }
-    // on enter press
+    // on enter key
     else if (key.sequence === '\r'){
 
         // write current words on serial 
@@ -136,11 +134,11 @@ stdin.on("keypress", (letter, key) => {
                 else {
                     text_cleaned = tweet.text.split(/https:\/\/\w+.co\/\w+/);
                 }
-
-                //FIXME: solve error when tweet contains apostrophes
                 
-                // when there is one unmatched quote symbol, festival crashes
-                // so only go on if we found 0 or 2
+                // This code was originally a work around for festival TTS,
+                // but I kept it also for the amazon polly TTS 
+                // (when there is one unmatched quote symbol, festival crashes
+                // so only go on if we found 0 or 2)
                 var double_quotes_count = (text_cleaned[0].match(/"/g) || []).length;
                 var single_quotes_count = (text_cleaned[0].match(/'/g) || []).length;
                 if ((double_quotes_count == 0 || double_quotes_count > 1) && (single_quotes_count == 0 || single_quotes_count > 1)){
@@ -152,14 +150,14 @@ stdin.on("keypress", (letter, key) => {
                         text_cleaned = text_cleaned.replace('“', '');
                         text_cleaned = text_cleaned.replace('”', '');                   
                         
-                        // say.stop();
+                        // Stop the twitter stream so we read just one twit at a time
                         twitter_stream.stop();
                         
                         console.log("----------------------------------");
                         console.log(text_cleaned);
                         console.log("----------------------------------");
                         
-                        // pick a random voice from the available ones
+                        // Pick a random voice from the available ones
                         let current_voice = voices.en[Math.floor(Math.random()*voices.en.length)];
                         
                         let params = {
@@ -169,7 +167,7 @@ stdin.on("keypress", (letter, key) => {
                         }
     
                         try {
-                            // synthesize the actual voice
+                            // Synthesize the actual voice
                             Polly.synthesizeSpeech(params, (err, data) => {
                                 if (err) {
                                     console.log(err.code)
@@ -190,13 +188,14 @@ stdin.on("keypress", (letter, key) => {
                                             buffer_stream.unpipe(player);
                                             buffer_stream.end();
                                             player.close();
+
+                                            // Start streaming again
                                             twitter_stream.start();
                                             
                                         })
                                     }
                                 }
                             });
-                            console.log(`heard a new tweet related to ${current_keywords}`);
                         }
                         catch (TypeError){
                             console.log("heard a new EMPTY tweet!");
@@ -204,7 +203,7 @@ stdin.on("keypress", (letter, key) => {
                     }   
                 }
             });
-            
+            // reset current keywords
             current_keywords = "";
         });
     }
