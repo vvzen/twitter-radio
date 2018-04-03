@@ -1,4 +1,4 @@
-// A basic example on how to use Amazon Polly.
+// A basic example on how to use achieve TTS using Amazon Polly.
 // kept in this repo for future reference.
 
 // Load the SDK
