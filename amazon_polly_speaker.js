@@ -1,3 +1,6 @@
+// A basic example on how to use Amazon Polly.
+// kept in this repo for future reference.
+
 // Load the SDK
 const AWS = require('aws-sdk')
 const Stream = require('stream')
